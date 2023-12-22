@@ -8,7 +8,9 @@ public class TestBase implements AppManager {
 
     @BeforeSuite
     public void setUp(){
-        init();
+
+        //init();
+        initAddOptions();
     }
 
     @AfterSuite
