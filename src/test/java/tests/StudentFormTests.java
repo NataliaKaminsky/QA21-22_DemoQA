@@ -4,10 +4,16 @@ import manager.HelperStudent;
 import models.StudentDTO;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import org.testng.asserts.SoftAssert;
 
 public class StudentFormTests extends TestBase implements HelperStudent {
+    SoftAssert softAssert = new SoftAssert();
+
+
     @BeforeClass
     public void goToPracticeForm() {
 
@@ -15,15 +21,73 @@ public class StudentFormTests extends TestBase implements HelperStudent {
         selectPracticeForm();
     }
 
+    @Test
+    public void registrationStudentPositiveTest_softAssert() {
+        StudentDTO student = new StudentDTO("Frodo", "Baggins", "frodobaggins@mail.com",
+                "Male", "1234567890", "10 Sep 2020", "Maths,English", "Sports",
+                "J.Washington street, 10", "NCR", "Delphi");
+        fillStudentForm(student);
+        clickButtonSubmit();
+        WebElement elementEmail = driver.findElement(By.xpath("//tbody/tr[2]/td[2]"));
+        WebElement elementPhone = driver.findElement(By.xpath("//tbody/tr[4]/td[2]"));
+        System.out.println(elementEmail.getText());
+        System.out.println(elementPhone.getText());
 
+        softAssert.assertEquals(elementEmail.getText(), "12345");
+        System.out.println("=========================");
+        softAssert.assertTrue(elementPhone.getText().equals(student.getMobile()));
+        softAssert.assertAll();
+
+
+    }
 
     @Test
-    public void registrationStudentPositiveTest(){
+    public void registrationStudentPositiveTest() {
         //WebElement element = driver.findElement(By.xpath("#outbrain_widget_0"));
 
         StudentDTO student = new StudentDTO("Frodo", "Baggins", "frodobaggins@mail.com",
                 "Male", "1234567890", "10 Sep 2020", "Maths,English", "Sports",
                 "J.Washington street, 10", "NCR", "Delphi");
         fillStudentForm(student);
+        clickButtonSubmit();
+        Assert.assertTrue(isElementPresent_thanks_for());
+    }
+
+    @Test
+    public void registrationStudentPositiveTest_1() {
+        //WebElement element = driver.findElement(By.xpath("#outbrain_widget_0"));
+
+        StudentDTO student = new StudentDTO("Frodo1", "Baggins1", "frodobaggins@mail.com",
+                "Male", "1234567890", "10 Sep 2020", "Maths,English", "Sports",
+                "J.Washington street, 10", "NCR", "Delphi");
+        fillStudentForm(student);
+        clickButtonSubmit();
+        Assert.assertTrue(isElementPresent_thanks_for());
+    }
+
+    @Test
+    public void registrationStudentNegativeTest_lastname_empty() {
+        //WebElement element = driver.findElement(By.xpath("#outbrain_widget_0"));
+
+        StudentDTO student = new StudentDTO("Frodo1", "", "frodobaggins@mail.com",
+                "Male", "1234567890", "10 Sep 2020", "Maths,English", "Sports",
+                "J.Washington street, 10", "NCR", "Delphi");
+        fillStudentForm(student);
+        clickButtonSubmit();
+        Assert.assertFalse(isElementPresent_thanks_for());
+    }
+
+
+    @AfterMethod
+    public void afterMethod() {
+        pause(3);
+        if (isElementPresent_thanks_for()) {
+
+            clickButtonCloseModal();
+        } else {
+            driver.navigate().refresh();
+            hideFooter();
+        }
+
     }
 }
